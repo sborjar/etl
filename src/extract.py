@@ -61,6 +61,10 @@ def loaddata(date_obj):
     
         log(f" Row exported = {len(rows)} rows")
         log(f" Elapsed exported = {elapsed_time2} seconds")
+
+        elapsed_total = elapsed_time1 + elapsed_time2
+        log(f" Elapsed total extraction = {elapsed_time2} seconds")
+    
     else:
         log(f" Query result is empty")
         
