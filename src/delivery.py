@@ -23,7 +23,7 @@ def delivery(action,date1,date2):
     
     for date in lista_fechas:
         result = loaddata(date)
-        print(result)
+        #print(result)
         time.sleep(2)
         #thread = threading.Thread(target=extract, args=(date))
         #thread.start()
