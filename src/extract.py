@@ -24,9 +24,6 @@ def loaddata(date_obj):
     
     cursor = db.cursor()
 
-    log(f'------------------------------------------------------------------------')
-    log(f'EXTRACTION PHASE')
-    log(f'------------------------------------------------------------------------')
     log(f' MODE: {mode}')
     log(f' DATE: {date_obj}')
 
