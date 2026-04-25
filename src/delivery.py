@@ -8,9 +8,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 
 from src.extract import extract
 
-
-
-
 def delivery(action,date1,date2):
     print(action, date1, date2)
     
