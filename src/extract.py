@@ -29,7 +29,7 @@ def loaddata(date1):
     log(f'DATE: {date1}')
 
     """ QUERY """
-    query = "SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, hangupcause, waiting, talked, wrapped, pushresult, sla, dispositioned FROM calls WHERE DATE(calldate) = %s"
+    query = "SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, wait{ing, talked, wrapped, sla, dispositioned FROM calls WHERE DATE(calldate) = %s"
     param = (date1,)
 
     start_time = time.perf_counter()
