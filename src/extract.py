@@ -25,6 +25,8 @@ def loaddata(date_obj):
     cursor = db.cursor()
 
     log(f'------------------------------------------------------------------------')
+    log(f'EXTRACTION PHASE')
+    log(f'------------------------------------------------------------------------')
     log(f' MODE: {mode}')
     log(f' DATE: {date_obj}')
 
@@ -42,7 +44,7 @@ def loaddata(date_obj):
     
         elapsed_time1 = end_time - start_time
     
-        log(f'Elapsed query = {elapsed_time1} seconds')
+        log(f' Elapsed query = {elapsed_time1} seconds')
     
         start_time = time.perf_counter()
     
@@ -60,10 +62,10 @@ def loaddata(date_obj):
         end_time = time.perf_counter()
         elapsed_time2 = end_time - start_time
     
-        log(f"Row exported = {len(rows)} rows")
-        log(f"Elapsed exported = {elapsed_time2} seconds")
+        log(f" Row exported = {len(rows)} rows")
+        log(f" Elapsed exported = {elapsed_time2} seconds")
     else:
-        log(f"Query result is empty")
+        log(f" Query result is empty")
         
     #cursor.close()
     #db.close()
