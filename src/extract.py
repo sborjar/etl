@@ -46,7 +46,7 @@ def loaddata(date_obj):
     
         start_time = time.perf_counter()
     
-        file = f"data/calls_{date1}.csv"
+        file = f"data/calls_{date_obj}.csv"
         with open(file, 'w', newline='', encoding='utf-8') as f:
            writer = csv.writer(f)
                           
