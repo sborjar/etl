@@ -68,7 +68,7 @@ def loaddata(date_obj):
     cursor.close()
     db.close()
 
-return rows
+    return rows
     
 
 
