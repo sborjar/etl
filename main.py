@@ -2,6 +2,8 @@ import sys
 from datetime import date, datetime, timedelta
 import pandas as pd
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
 from src.delivery import delivery
 
 def main():
