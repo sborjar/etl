@@ -34,8 +34,8 @@ def loaddata(date1):
 
     start_time = time.perf_counter()
 
-    # cursor.execute(query, param)
-    # rows = cursor.fetchall()
+    cursor.execute(query, param)
+    rows = cursor.fetchall()
 
     end_time = time.perf_counter()
 
