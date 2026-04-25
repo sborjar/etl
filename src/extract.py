@@ -19,18 +19,18 @@ def log(msg):
     print(msg)
     logger.info(msg)
 
-def loaddata(date1):
+def loaddata(date_obj):
     """ It retrieves the raw data from the calls, tenant, dialer_campaigns, and users tables.  """
     
     cursor = db.cursor()
 
     log(f'------------------------------------------------------------------------')
     log(f'MODE: {mode}')
-    log(f'DATE: {date1}')
+    log(f'DATE: {date_obj}')
 
     """ QUERY """
     query = "SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, wait{ing, talked, wrapped, sla, dispositioned FROM calls WHERE DATE(calldate) = %s"
-    param = (date1,)
+    param = (date_obj, )
 
     start_time = time.perf_counter()
 
