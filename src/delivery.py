@@ -7,7 +7,7 @@ import time
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
-from src.extract import loaddata
+from src.extract import loaddata, log
 
 def delivery(action,date1,date2):
     print(action, date1, date2)
@@ -22,10 +22,13 @@ def delivery(action,date1,date2):
     print(lista_fechas)
     
     for date in lista_fechas:
+        log(f'------------------------------------------------------------------------')
+        log(f'EXTRACTION PHASE')
+        log(f'------------------------------------------------------------------------')
         result = loaddata(date)
-        #print(result)
         time.sleep(2)
+        
         #thread = threading.Thread(target=extract, args=(date))
         #thread.start()
         
-    print("se fini")
+    print("END")
