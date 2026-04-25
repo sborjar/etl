@@ -2,22 +2,16 @@ from datetime import datetime
 import os
 import time
 import csv
-import logging
+
 from dotenv import load_dotenv
 
 from src.db.connection import db
+from src.funcs import log
+
 
 load_dotenv()
 
 mode = os.getenv("MODE", "SNBX")
-
-logger = logging.getLogger("callevo")
-logging.basicConfig(filename='logs/etl.log', level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
-
-
-def log(msg):
-    print(msg)
-    logger.info(msg)
 
 def loaddata(date_obj):
     """ It retrieves the raw data from the calls, tenant, dialer_campaigns, and users tables.  """
@@ -71,7 +65,7 @@ def loaddata(date_obj):
     #cursor.close()
     #db.close()
 
-    return rows
+    return rows, elapsed_total
     
 
 

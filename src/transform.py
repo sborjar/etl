@@ -2,14 +2,14 @@ import numpy as np
 import pandas as pd
 import os
 import time
-import logging
 
-from src.extract import log
+from src.funcs import log
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def load_data(file):
-    log(f"Importing file {file}")
+def load_data(date, prefix): 
+    file = f"{prefix}_{date}.csv"
+    log(f" Importing file {file}")
     BASE_DIR = os.getcwd() 
     DATA_PROCESS_DIR = os.path.join(BASE_DIR, 'data')
     PROCESSED_FILE = os.path.join(DATA_PROCESS_DIR, file)
@@ -17,21 +17,38 @@ def load_data(file):
         df = pd.read_csv(PROCESSED_FILE, encoding='latin1')
         return df
     except FileNotFoundError:
-        print(f"Error: No se encontró el archivo {PROCESSED_FILE}")
+        log(f"Error: No se encontró el archivo {PROCESSED_FILE}")
         return None
     
-def transform(df):
+def delete_file(date, prefix): 
+    file = f"{prefix}_{date}.csv"
+    log(f" Deleting file {file}")
+    BASE_DIR = os.getcwd() 
+    DATA_PROCESS_DIR = os.path.join(BASE_DIR, 'data')
+    PROCESSED_FILE = os.path.join(DATA_PROCESS_DIR, file)
+    try:
+        os.remove(PROCESSED_FILE)
+    except FileNotFoundError:
+        log(f"Error: No se encontró el archivo {PROCESSED_FILE}")
+        return None
+    
+def transform(date):
     """ 
     Function that transforms the extracted date for processing into billing information.
     """
+    start_time = time.perf_counter()
+    df = load_data(date, "calls")
+    end_time = time.perf_counter()
+    elapsed_time_load = end_time - start_time
+    log(f" Elapsed file load = {elapsed_time_load} seconds")
+    
+    if df is None or df.empty:
+        log(f" The file is empty or does not exist")
+        return None
     
     # start time to elapsed 
     start_time = time.perf_counter()
-    
-    # Load data in memory
-    # file = "data/temp.csv"
-    # df = load_data(file)
-    
+
     # Convert calldate to datetime format
     df["calldate"] = pd.to_datetime(df["calldate"])
 
@@ -61,7 +78,7 @@ def transform(df):
     # Preparation
     # ----------------
     
-    dt_resultado = df.groupby(['tenantid', 'year', 'month', 'day']).agg(
+    dt_resultado = df.groupby(['tenantid', 'camp_id', 'year', 'month', 'day' ]).agg(
         agents=('agentid', 'nunique'),
         totalcalls=('callid', 'count'),
         totalagentcalls=('is_agent_call', 'sum'),
@@ -78,18 +95,15 @@ def transform(df):
     dt_resultado['billsec'] *= 1.3
 
     end_time = time.perf_counter()
-    elapsed_time = end_time - start_time
+    elapsed_time_transform = end_time - start_time
     
-   
     print(dt_resultado.head(5))
     
-    log(f"Transform for {file} elapsed {elapsed_time} second ")
+    log(f" Elapsed operations {elapsed_time_transform} second ")
     
-    dt_resultado.to_csv(f'data/summary_{file}', index=False)
-
-# if __name__ == "__main__":
-#     print("casa")    
-#     transform("calls_2026-04-23.csv")
+    # dt_resultado.to_csv(f'data/summary_{date}', index=False)
     
+    elapsed_total = elapsed_time_load + elapsed_time_transform
+    log(f" Elapsed total transform = {elapsed_time_transform} second ")
     
-    
+    return dt_resultado
