@@ -2,7 +2,7 @@ from concurrent.futures import thread
 import threading
 import pandas as pd
 
-from src.extract import extract
+from .extract import extract
 
 def delivery(action,date1,date2):
     print(action, date1, date2)
