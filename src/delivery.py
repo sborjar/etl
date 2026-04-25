@@ -3,6 +3,7 @@ import threading
 import pandas as pd
 import sys
 import os
+import time
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
@@ -21,7 +22,9 @@ def delivery(action,date1,date2):
     print(lista_fechas)
     
     for date in lista_fechas:
-        loaddata(date)
+        result = loaddata(date)
+        print(result)
+        time.sleep(2)
         #thread = threading.Thread(target=extract, args=(date))
         #thread.start()
         
