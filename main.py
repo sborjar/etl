@@ -22,19 +22,19 @@ def main():
     print("█████████████████████████████████████████████████████████")
     
     if len(sys.argv) > 1:
-        print(f"Argumentos recibidos: {sys.argv[1:]}")
+        # print(f"Argumentos recibidos: {sys.argv[1:]}")
 
         action = sys.argv[1]
         d1 = ""
         d2 = ""
 
         if action == 'r':
-            """ Rango de fechas """
+            """ Date range """
             d1 = sys.argv[2]
             d2 = sys.argv[3]
 
         elif action == 'd':
-            """ Consulta por fecha unica """
+            """ Search by a single date """
             d1 = sys.argv[2]
         
         elif action == 'h':
@@ -64,7 +64,6 @@ def main():
                 
     else:
         log("You need to set the execution parameters. Check the help by typing << python main.py h >>")
-    
 
 if __name__ == "__main__":
     main()
