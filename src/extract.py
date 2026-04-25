@@ -62,11 +62,13 @@ def loaddata(date_obj):
     
         log(f"Row exported = {len(rows)} rows")
         log(f"Elapsed exported = {elapsed_time2} seconds")
-        cursor.close()
-        db.close()
     else:
         log(f"Query result is empty")
         
+    cursor.close()
+    db.close()
+
+return rows
     
 
 
