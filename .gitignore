@@ -6,4 +6,5 @@ __pycache__
 *.sql
 requirements.txt
 .env
-.csv
+*.csv
+*.txt
