@@ -54,6 +54,7 @@ def delivery(action,date1,date2):
         log(f' TRANSFORM PHASE - SUMARY')
         
         dt_resultado = df_general.groupby(['tenantid', 'camp_id', 'year', 'month' ]).agg(
+            agents=('agentid', 'nunique'),
             totalcalls=('totalcalls', 'sum'),
             totalagentcalls=('totalagentcalls', 'sum'),
             totaldrops=('totaldrops', 'sum'),
@@ -69,6 +70,7 @@ def delivery(action,date1,date2):
         dt_resultado.to_csv(f'data/summary_{date1[:7]}_by_camp.csv', index=False)   
         
         dt_resultado = df_general.groupby(['tenantid', 'year', 'month' ]).agg(
+            agents=('agentid', 'nunique'),
             totalcalls=('totalcalls', 'sum'),
             totalagentcalls=('totalagentcalls', 'sum'),
             totaldrops=('totaldrops', 'sum'),

@@ -99,8 +99,6 @@ def transform(date):
     
     log(f" Elapsed operations {elapsed_time_transform} second ")
     
-    # dt_resultado.to_csv(f'data/summary_{date}', index=False)
-    
     elapsed_total = elapsed_time_load + elapsed_time_transform
     log(f" Elapsed total transform = {elapsed_time_transform} second ")
     

@@ -84,9 +84,3 @@ def loadDB(d1):
         except Exception as err:
             log(f"Error: {err}")
     
-
-
-# if __name__ == "__main__":
-#     d1 = "2026-04-01"
-#     loadDB(d1)
-    
