@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from src.funcs import log
 
-
 load_dotenv()
 mode = os.getenv("MODE", "SNBX")
 user = os.getenv(f"DB_USER_{mode}", "SNBX")

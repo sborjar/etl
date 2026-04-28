@@ -46,6 +46,7 @@ def transform(date1,date2):
         log(f" Loading calls_{date}.csv ...")
         df_file = load_data(date, "calls")
         df = pd.concat([df, df_file ], ignore_index=True)
+    end_time = time.perf_counter()
     elapsed_time_load = end_time - start_time
     log(f" Elapsed file load = {elapsed_time_load} seconds")
     
