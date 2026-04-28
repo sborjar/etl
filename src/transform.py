@@ -32,7 +32,7 @@ def delete_file(date, prefix):
         log(f"Error: No se encontró el archivo {PROCESSED_FILE}")
         return None
     
-def transform(d1,d2):
+def transform(date1,date2):
     """ 
     Function that transforms the extracted date for processing into billing information.
     """
@@ -123,7 +123,7 @@ def transform(d1,d2):
     log(f" Elapsed operations {elapsed_time_transform} second ")
     
     log("Saving files ...")
-    fname = d1[:7]
+    fname = date1[:7]
     log(f"fname {fname}")
     df_day.to_csv(f'data/summary_{fname}_by_day.csv', index=False)
     df_summary_cmp.to_csv(f'data/summary_{fname}_by_camp.csv', index=False)

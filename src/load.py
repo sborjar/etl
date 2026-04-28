@@ -44,8 +44,8 @@ def loadDB(d1):
     file_camp = f'summary_{d1[:7]}_by_camp'
     df_camp = load_data(file_camp)
     
-    file_month = f'summary_{d1[:7]}_by_month'
-    df_month = load_data(file_month)
+    # file_month = f'summary_{d1[:7]}_by_month'
+    # df_month = load_data(file_month)
     
     end_time = time.perf_counter()
     elapsed_time_load = end_time - start_time
@@ -75,12 +75,12 @@ def loadDB(d1):
         except Exception as err:
             log(f"Error: {err}")
     
-    if df_month is None or df_month.empty:
-        log(f" File {file_month} is empty or not found")
-    else:
-        log(f" SAVING {file_month}")
-        try:
-            df_month.to_sql(name='billing_summary_month', con=engine, if_exists='append', index=False)
-        except Exception as err:
-            log(f"Error: {err}")
+    # if df_month is None or df_month.empty:
+    #     log(f" File {file_month} is empty or not found")
+    # else:
+    #     log(f" SAVING {file_month}")
+    #     try:
+    #         df_month.to_sql(name='billing_summary_month', con=engine, if_exists='append', index=False)
+    #     except Exception as err:
+    #         log(f"Error: {err}")
     
