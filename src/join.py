@@ -142,7 +142,7 @@ def join(d1, d2):
     
     if df_general is not None:
         for date in lista_fechas:
-            print(f"Processing calls_{date}.csv ..")
+            log(f"Processing calls_{date}.csv ...")
             df = load_data(date, "calls")
             
             df_general = pd.concat([df_general, df ], ignore_index=True)

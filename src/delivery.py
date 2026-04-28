@@ -34,8 +34,10 @@ def delivery(action,date1,date2):
     
     log(f' ------------------------ EXTRACTION PHASE')
     start_time_ex = time.perf_counter()
+    
     for date in lista_fechas:
         result = loaddata(date)
+    
     end_time_ex = time.perf_counter()
     ex_total = end_time_ex - start_time_ex
     log(f" Elapsed Extraction {ex_total} second ")
@@ -65,5 +67,12 @@ def delivery(action,date1,date2):
     end_time = time.perf_counter()
     elapsed_total = end_time - start_time
     
-    log(f"Elapsed General = {elapsed_total}")
+    
+    log(f'----------------------------- TOTALS -------------------------------------------')
+    log(f" Elapsed Extraction                   {ex_total} seconds ")
+    log(f" Elapsed Join                         {join_total} seconds ")
+    log(f" Elapsed Transformation               {tra_total} seconds ")
+    log(f" Elapsed Load                         {load_total } seconds ")
+    log(f"                              ---------------------------- ")
+    log(f" Elapsed General =                    {elapsed_total} seconds")
     log(f'----------------------------- END -------------------------------------------')
