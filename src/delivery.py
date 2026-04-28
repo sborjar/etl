@@ -9,9 +9,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 
 from src.extract import loaddata
 from src.funcs import log
-from src.transform import transform
+# from src.transform import transform
 from src.load import loadDB
-from src.join import join
+from src.join import join, transform
 
 def delivery(action,date1,date2):
     
@@ -43,12 +43,12 @@ def delivery(action,date1,date2):
     log(f" Elapsed Extraction {ex_total} second ")
     
 
-    # log(f' ------------------------ JOIN PHASE')
-    # start_time_join = time.perf_counter()
-    # join(date1,date2)
-    # end_time_join = time.perf_counter()
-    # join_total = end_time_join - start_time_join
-    # log(f" Elapsed Join {join_total} second ")
+    log(f' ------------------------ JOIN PHASE')
+    start_time_join = time.perf_counter()
+    join(date1,date2)
+    end_time_join = time.perf_counter()
+    join_total = end_time_join - start_time_join
+    log(f" Elapsed Join {join_total} second ")
     
     log(f' ------------------------ TRANSFORM PHASE')
     start_time_tra = time.perf_counter()
