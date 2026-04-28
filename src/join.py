@@ -2,6 +2,11 @@ import numpy as np
 import pandas as pd
 import os
 import time
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+from src.funcs import log
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -113,25 +118,23 @@ def transform(d1,d2):
 
     end_time = time.perf_counter()
     elapsed_time_transform = end_time - start_time
-    print(f" Elapsed operations {elapsed_time_transform} second ")
+    log(f" Elapsed operations {elapsed_time_transform} second ")
     
-    print(f"Date={d1}")
+    log(f"Date={d1}")
     log("Saving files ...")
     fname = d1[:7]
-    print(f"fname {fname}")
+    log(f"fname {fname}")
     df_day.to_csv(f'data/summary_{fname}_by_day.csv', index=False)
     df_summary_cmp.to_csv(f'data/summary_{fname}_by_camp.csv', index=False)
     df_summary_month.to_csv(f'data/summary_{fname}_by_month.csv', index=False)  
     
     elapsed_total = elapsed_time_load + elapsed_time_transform
     
-    print(f" Elapsed total transform = {elapsed_total} second ")
+    log(f" Elapsed total transform = {elapsed_total} second ")
     
 
 
 def join(d1, d2):
-    start_time = time.perf_counter()
-    
     date_range = pd.date_range(start=d1, end=d2)
     lista_fechas = date_range.strftime('%Y-%m-%d').tolist()
 
@@ -144,12 +147,6 @@ def join(d1, d2):
             
             df_general = pd.concat([df_general, df ], ignore_index=True)
     
-    print("Saving file ...")
+    log("Saving file ...")
     df_general.to_csv(f'data/general_{d1}_{d2}.csv', index=False)
     
-   
-    
-    end_time = time.perf_counter()
-    etotal = end_time - start_time
-    
-    print(f" Elapsed Total  {etotal} second ")

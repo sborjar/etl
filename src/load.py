@@ -6,9 +6,9 @@ import time
 from sqlalchemy import create_engine
 import pymysql
 from dotenv import load_dotenv
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from src.funcs import log
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 load_dotenv()
 mode = os.getenv("MODE", "SNBX")

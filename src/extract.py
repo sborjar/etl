@@ -21,7 +21,8 @@ def loaddata(date_obj):
     log(f' DATE: {date_obj}')
 
     """ QUERY """
-    query = "SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, waiting, talked, wrapped, sla, dispositioned FROM calls WHERE DATE(calldate) = %s"
+    # query = "SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, waiting, talked, wrapped, sla, dispositioned FROM calls WHERE DATE(calldate) = %s"
+    query = "SELECT * FROM calls WHERE DATE(calldate) = %s"
     param = (date_obj, )
     
     start_time = time.perf_counter()
@@ -54,9 +55,6 @@ def loaddata(date_obj):
     
         log(f" Row exported = {len(rows)} rows")
         log(f" Elapsed exported = {elapsed_time2} seconds")
-
-        elapsed_total = elapsed_time1 + elapsed_time2
-        log(f" Elapsed total extraction = {elapsed_total} seconds")
     
     else:
         log(f" Query result is empty")
