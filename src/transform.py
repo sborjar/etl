@@ -93,11 +93,9 @@ def transform(date):
     ).reset_index()
     
     dt_resultado['billsec'] *= 1.3
-
+    
     end_time = time.perf_counter()
     elapsed_time_transform = end_time - start_time
-    
-    print(dt_resultado.head(5))
     
     log(f" Elapsed operations {elapsed_time_transform} second ")
     

@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 from src.db.connection import db
 from src.funcs import log
 
-
 load_dotenv()
 
 mode = os.getenv("MODE", "SNBX")
