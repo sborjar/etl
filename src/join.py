@@ -40,33 +40,35 @@ def transform(d1,d2):
     start_time = time.perf_counter()
 
     # Convert calldate to datetime format
+    log(f" Convert calldate to datetime format")
     df["calldate"] = pd.to_datetime(df["calldate"])
 
     # -----------------
     # Preparation
     # ----------------
-    
+    log(f" Add columns year, month, day")
     # Add columns year, month, day
     df["year"] =  df['calldate'].dt.year
     df["month"] =  df['calldate'].dt.month
     df["day"] =  df['calldate'].dt.day
     
+    log(f" Make sure there are no null values")
     # Make sure there are no null values
     df['billsec'] = pd.to_numeric(df['billsec'], errors='coerce').fillna(0)
     
+    log(f" Cost calculation")
     # Cost calculation
     df['units_calc'] = np.where(
         df['billsec'] == 0,
         0,
         np.maximum(3, np.ceil(df['billsec'] / 6 * 1.3))
     )
+    log(f" Condition for callresult 1 and 5 ")
     # Condition for callresult 1 and 5 
     df['is_agent_call'] = (df['callresult'] == 1).astype(int)
     df['is_drop']       = (df['callresult'] == 5).astype(int)
 
-    # -----------------
-    # Preparation
-    # ----------------
+    log(f" Grouping Day ")
     
     df_day = df.groupby(['tenantid', 'camp_id', 'year', 'month', 'day' ]).agg(
         agents=('agentid', 'nunique'),
@@ -84,6 +86,7 @@ def transform(d1,d2):
     
     df_day['billsec'] *= 1.3
 
+    log(f" Grouping Campaign ")
     df_summary_cmp = df.groupby(['tenantid', 'camp_id', 'year', 'month' ]).agg(
         agents=('agentid', 'nunique'),
         totalcalls=('callid', 'count'),
@@ -120,19 +123,19 @@ def transform(d1,d2):
     elapsed_time_transform = end_time - start_time
     log(f" Elapsed operations {elapsed_time_transform} second ")
     
-    log(f"Date={d1}")
-    log("Saving files ...")
     fname = d1[:7]
-    log(f"fname {fname}")
+
+    log("Saving data/summary_{fname}_by_day.csv ...")
     df_day.to_csv(f'data/summary_{fname}_by_day.csv', index=False)
+    
+    log("Saving data/summary_{fname}_by_camp.csv ...")
     df_summary_cmp.to_csv(f'data/summary_{fname}_by_camp.csv', index=False)
+
     # df_summary_month.to_csv(f'data/summary_{fname}_by_month.csv', index=False)  
     
     elapsed_total = elapsed_time_load + elapsed_time_transform
     
     log(f" Elapsed total transform = {elapsed_total} second ")
-    
-
 
 def join(d1, d2):
     date_range = pd.date_range(start=d1, end=d2)
