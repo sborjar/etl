@@ -3,26 +3,19 @@ import os
 import time
 import csv
 
-from dotenv import load_dotenv
-
 from src.db.connection import db
 from src.funcs import log
-
-load_dotenv()
-
-mode = os.getenv("MODE", "SNBX")
 
 def loaddata(date_obj):
     """ It retrieves the raw data from the calls, tenant, dialer_campaigns, and users tables.  """
     
     cursor = db.cursor()
 
-    log(f' MODE: {mode}')
+    log(f'--------------------------------------')
     log(f' DATE: {date_obj}')
 
     """ QUERY """
     query = "SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, waiting, talked, wrapped, sla, dispositioned FROM calls WHERE DATE(calldate) = %s"
-    # query = "SELECT * FROM calls WHERE DATE(calldate) = %s"
     param = (date_obj, )
     
     start_time = time.perf_counter()
@@ -59,7 +52,6 @@ def loaddata(date_obj):
     else:
         log(f" Query result is empty")
         
-    return rows
     
 
 
