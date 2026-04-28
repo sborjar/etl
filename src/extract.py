@@ -26,11 +26,11 @@ def loaddata(date_obj):
     engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}/{database}")
     
     """ QUERY """
-    query = "SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, waiting, talked, wrapped, sla, dispositioned FROM calls WHERE DATE(calldate) = %s"
-    param = (date_obj, )
+    query = "SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, waiting, talked, wrapped, sla, dispositioned FROM calls WHERE DATE(calldate) = :date"
+    params = {"date": date_obj}
     
     start_time = time.perf_counter()
-    df = pd.read_sql(query, engine)
+    df = pd.read_sql(query, engine, params=params)
     end_time = time.perf_counter()
     elapsed_time_query = end_time - start_time
     log(f' Elapsed query = {elapsed_time_query} seconds')
