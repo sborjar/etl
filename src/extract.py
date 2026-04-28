@@ -15,16 +15,13 @@ user = os.getenv(f"DB_USER_{mode}", "SNBX")
 password = os.getenv(f"DB_PASS_{mode}", "SNBX")
 host = os.getenv(f"DB_HOST_{mode}", "SNBX")
 database = os.getenv("DB_NAME", "SNBX")
-
+engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}/{database}")
 
 def loaddata(date_obj):
     """ It retrieves the raw data from the calls, tenant, dialer_campaigns, and users tables.  """
     
     log(f'--------------------------------------')
     log(f' DATE: {date_obj}')
-    
-    log(" CREATE ENGINE")
-    engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}/{database}")
     
     """ QUERY """
     query =  text("SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, waiting, talked, wrapped, sla, dispositioned FROM calls WHERE DATE(calldate) = :date")

@@ -20,18 +20,6 @@ def load_data(date, prefix):
         log(f"Error: No se encontró el archivo {PROCESSED_FILE}")
         return None
     
-def delete_file(date, prefix): 
-    file = f"{prefix}_{date}.csv"
-    log(f" Deleting file {file}")
-    BASE_DIR = os.getcwd() 
-    DATA_PROCESS_DIR = os.path.join(BASE_DIR, 'data')
-    PROCESSED_FILE = os.path.join(DATA_PROCESS_DIR, file)
-    try:
-        os.remove(PROCESSED_FILE)
-    except FileNotFoundError:
-        log(f"Error: No se encontró el archivo {PROCESSED_FILE}")
-        return None
-    
 def transform(date1,date2):
     """ 
     Function that transforms the extracted date for processing into billing information.
@@ -43,12 +31,14 @@ def transform(date1,date2):
     
     df = pd.DataFrame()
     for date in lista_fechas:
-        log(f" Loading calls_{date}.csv ...")
         df_file = load_data(date, "calls")
         df = pd.concat([df, df_file ], ignore_index=True)
     end_time = time.perf_counter()
     elapsed_time_load = end_time - start_time
-    log(f" Elapsed file load = {elapsed_time_load} seconds")
+    log(f" Elapsed file join = {elapsed_time_load} seconds")
+    log(f" Total Records to transform = {len(df)}")
+    
+    log(f" Stating Transform")
     
     if df is None or df.empty:
         log(f" The file is empty or does not exist")
@@ -58,34 +48,32 @@ def transform(date1,date2):
     start_time = time.perf_counter()
 
     # Convert calldate to datetime format
+    log(f" Convert calldate to datetime format")
     df["calldate"] = pd.to_datetime(df["calldate"])
 
-    # -----------------
-    # Preparation
-    # ----------------
-    
-    # Add columns year, month
+    log(f" Add columns year, month and day")
+    # Add columns year, month, day
     df["year"] =  df['calldate'].dt.year
     df["month"] =  df['calldate'].dt.month
     df["day"] =  df['calldate'].dt.day
     
+    log(f" Make sure there are no null values")
     # Make sure there are no null values
     df['billsec'] = pd.to_numeric(df['billsec'], errors='coerce').fillna(0)
     
     # Cost calculation
+    log(f" Cost calculation")
     df['units_calc'] = np.where(
         df['billsec'] == 0,
         0,
         np.maximum(3, np.ceil(df['billsec'] / 6 * 1.3))
     )
+    log(f" Condition for callresult 1 and 5 ")
     # Condition for callresult 1 and 5 
     df['is_agent_call'] = (df['callresult'] == 1).astype(int)
     df['is_drop']       = (df['callresult'] == 5).astype(int)
 
-    # -----------------
-    # Preparation
-    # ----------------
-    
+    log(f" Grouping By Day")
     df_day = df.groupby(['tenantid', 'camp_id', 'year', 'month', 'day' ]).agg(
         agents=('agentid', 'nunique'),
         totalcalls=('callid', 'count'),
@@ -102,6 +90,7 @@ def transform(date1,date2):
     
     df_day['billsec'] *= 1.3
     
+    log(f" Grouping By DayCampaign")
     df_summary_cmp = df.groupby(['tenantid', 'camp_id', 'year', 'month' ]).agg(
         agents=('agentid', 'nunique'),
         totalcalls=('callid', 'count'),
@@ -132,7 +121,6 @@ def transform(date1,date2):
     
     elapsed_total = elapsed_time_load + elapsed_time_transform
     log(f" Elapsed total transform = {elapsed_time_transform} second ")
-    
 
     
 # def transform(d1,d2):
