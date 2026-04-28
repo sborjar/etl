@@ -147,12 +147,7 @@ def join(d1, d2):
     print("Saving file ...")
     df_general.to_csv(f'data/general_{d1}_{d2}.csv', index=False)
     
-    log(f' ------------------------ TRANSFORM PHASE')
-    start_time_t = time.perf_counter()
-    transform(d1,d2)
-    end_time_t = time.perf_counter()
-    ttotal = end_time_t - start_time_t
-    print(f" Elapsed Transformation {ttotal } second ")
+   
     
     end_time = time.perf_counter()
     etotal = end_time - start_time

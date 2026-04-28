@@ -11,7 +11,7 @@ from src.extract import loaddata
 from src.funcs import log
 # from src.transform import transform
 from src.load import loadDB
-from src.join import join
+from src.join import join, transform
 
 def delivery(action,date1,date2):
     # print(action, date1, date2)
@@ -38,7 +38,7 @@ def delivery(action,date1,date2):
         result = loaddata(date)
 
     log(f' ------------------------ JOIN PHASE')
-    result = join(d1,d2)
+    result = join(date1,date2)
 
         # log(f' ------------------------ TRANSFORM PHASE')
         # log(f' ------------ TRANSFORM PHASE / CLASIFICATION, CLEANING AND GROUPING.')
@@ -88,7 +88,14 @@ def delivery(action,date1,date2):
         # ).reset_index()
         
         # dt_resultado.to_csv(f'data/summary_{date1[:7]}_by_month.csv', index=False)   
-        
+    
+    log(f' ------------------------ TRANSFORM PHASE')
+    start_time_t = time.perf_counter()
+    transform(date1,date2)
+    end_time_t = time.perf_counter()
+    ttotal = end_time_t - start_time_t
+    print(f" Elapsed Transformation {ttotal } second ")
+    
     log(f' ------------------------ LOAD')
     loadDB(date1)
         
