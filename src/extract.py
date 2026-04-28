@@ -4,7 +4,7 @@ import time
 import csv
 import pandas as pd
 import pymysql
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 # from src.db.connection import db
 from src.funcs import log
