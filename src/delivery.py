@@ -16,7 +16,7 @@ def delivery(action,date1,date2):
     # print(action, date1, date2)
     
     log(f'----------------------------- BEGIN -------------------------------------------')
-    log(f' ACTION: {'Especific date' if action == "d" else "Range date"}')
+    log(f' ACTION: {"Especific date" if action == "d" else "Range date"}')
     log(f' DATE: {date1} to {date2}')
     log(f'')
     
