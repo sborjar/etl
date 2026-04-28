@@ -37,7 +37,7 @@ def loaddata(date_obj):
     log(f' Elapsed query = {elapsed_time_query} seconds')
     
     start_time = time.perf_counter()
-    df_general.to_csv(f"data/calls_{date_obj}.csv", index=False)
+    df.to_csv(f"data/calls_{date_obj}.csv", index=False)
     end_time = time.perf_counter()
     elapsed_time_save = end_time - start_time
     log(f' Elapsed save file = {elapsed_time_save} seconds')
