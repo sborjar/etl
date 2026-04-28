@@ -3,6 +3,7 @@ import os
 import time
 import csv
 import pandas as pd
+import pymysql
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 # from src.db.connection import db
@@ -26,7 +27,7 @@ def loaddata(date_obj):
     engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}/{database}")
     
     """ QUERY """
-    query = "SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, waiting, talked, wrapped, sla, dispositioned FROM calls WHERE DATE(calldate) = :date"
+    query =  text("SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, waiting, talked, wrapped, sla, dispositioned FROM calls WHERE DATE(calldate) = :date")
     params = {"date": date_obj}
     
     start_time = time.perf_counter()
