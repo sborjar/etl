@@ -61,10 +61,7 @@ def loaddata(date_obj):
     else:
         log(f" Query result is empty")
         
-    #cursor.close()
-    #db.close()
-
-    return rows, elapsed_total
+    return rows
     
 
 
