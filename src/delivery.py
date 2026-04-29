@@ -11,7 +11,7 @@ from src.extract import loaddata
 from src.funcs import log
 from src.transform import transformDay, transform
 from src.load import loadDB
-from src.join import join|
+from src.join import join
 
 def delivery(action,date1,date2):
     
