@@ -60,7 +60,7 @@ def loadDB(d1):
     else:
         log(f" SAVING {file_day}")
         try:
-            df_day.to_sql(name='billing_detail', con=engine, if_exists='append', index_col='billid')
+            df_day.to_sql(name='billing_detail', con=engine, if_exists='append', index=False)
         except Exception as err:
             log(f"Error: {err}")
     
@@ -70,7 +70,7 @@ def loadDB(d1):
     else:
         log(f" SAVING {file_camp}")
         try:
-            df_camp.to_sql(name='billing_summary_campaign', con=engine, if_exists='append', index_col='billsumid')
+            df_camp.to_sql(name='billing_summary_campaign', con=engine, if_exists='append', index=False)
         except Exception as err:
             log(f"Error: {err}")
     
@@ -105,7 +105,7 @@ def loadDBDay(d1):
     else:
         log(f" SAVING {file_day}")
         try:
-            df_day.to_sql(name='billing_detail', con=engine, if_exists='append', index_col='billid')
+            df_day.to_sql(name='billing_detail', con=engine, if_exists='append',index=False)
         except Exception as err:
             log(f"Error: {err}")
     

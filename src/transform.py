@@ -239,7 +239,7 @@ def transformDay(d1):
     
     fname = d1
 
-    log("Saving data/summary_{fname}_by_day.csv ...")
+    log(f"Saving data/summary_{fname}_by_day.csv ...")
     df_day.to_csv(f'data/summary_{fname}_by_day.csv', index=False)
     
     # log("Saving data/summary_{fname}_by_camp.csv ...")

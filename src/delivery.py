@@ -88,7 +88,8 @@ def delivery(action,date1,date2):
     log(f'----------------------------- TOTALS -------------------------------------------')
     log(f" Date                                 {date1} {date2}")
     log(f" Elapsed Extraction                   {ex_total} seconds ")
-    log(f" Elapsed Join                         {join_total} seconds ")
+    if (action=="r"):
+        log(f" Elapsed Join                         {join_total} seconds ")
     log(f" Elapsed Transformation               {tra_total} seconds ")
     log(f" Elapsed Load                         {load_total } seconds ")
     log(f"                                      -------------------------------- ")
