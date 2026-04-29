@@ -60,7 +60,7 @@ def loadDB(d1):
     else:
         log(f" SAVING {file_day}")
         try:
-            df_day.to_sql(name='billing_detail', con=engine, if_exists='append', index=False)
+            df_day.to_sql(name='billing_detail', con=engine, if_exists='append', index_col='billid')
         except Exception as err:
             log(f"Error: {err}")
     
@@ -70,7 +70,7 @@ def loadDB(d1):
     else:
         log(f" SAVING {file_camp}")
         try:
-            df_camp.to_sql(name='billing_summary_campaign', con=engine, if_exists='append', index=False)
+            df_camp.to_sql(name='billing_summary_campaign', con=engine, if_exists='append', index_col='billsumid')
         except Exception as err:
             log(f"Error: {err}")
     
@@ -82,4 +82,30 @@ def loadDB(d1):
     #         df_month.to_sql(name='billing_summary_month', con=engine, if_exists='append', index=False)
     #     except Exception as err:
     #         log(f"Error: {err}")
+    
+    
+def loadDBDay(d1):
+    """ 
+    Function that retrieves information from the summary files and uploads it to the database
+    """
+    start_time = time.perf_counter()
+    
+    file_day = f'summary_{d1}_by_day'
+    df_day = load_data(file_day)
+   
+    end_time = time.perf_counter()
+    elapsed_time_load = end_time - start_time
+    log(f" Elapsed files load = {elapsed_time_load} seconds")
+    
+    log(" CREATE ENGINE")
+    engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}/{database}")
+    
+    if df_day is None or df_day.empty:
+        log(f" File {file_day} is empty or not found")
+    else:
+        log(f" SAVING {file_day}")
+        try:
+            df_day.to_sql(name='billing_detail', con=engine, if_exists='append', index_col='billid')
+        except Exception as err:
+            log(f"Error: {err}")
     
