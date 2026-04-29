@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from src.extract import loaddata
 from src.funcs import log
 from src.transform import transformDay, transform
-from src.load import loadDB
+from src.load import loadDB, loadDBDay
 from src.join import join
 
 def delivery(action,date1,date2):
