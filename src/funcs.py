@@ -14,6 +14,9 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(message)s'
 )
 
-def log(msg):
+def log(msg, type=""):
     print(msg)
-    logger.info(msg)
+    if type=="":
+        logger.info(msg)
+    elif type =="error":
+        logger.error(msg)
