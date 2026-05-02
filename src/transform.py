@@ -16,7 +16,6 @@ def transform(df, deep=0):
     
     log(f' >>> TRANSFORM ')
     
-    
     if df is None or df.empty:
         log(f" The Data frame comes empty")
         return None
@@ -25,19 +24,19 @@ def transform(df, deep=0):
     start_time = time.perf_counter()
 
     # Convert calldate to datetime format
-    # log(f" Convert calldate to datetime format")
+    log(f" Convert calldate to datetime format")
     df["calldate"] = pd.to_datetime(df["calldate"])
 
     # -----------------
     # Preparation
     # ----------------
-    # log(f" Add columns year, month, day")
+    log(f" Add columns year, month, day")
     # Add columns year, month, day
     df["year"] =  df['calldate'].dt.year
     df["month"] =  df['calldate'].dt.month
     df["day"] =  df['calldate'].dt.day
     
-    # log(f" Make sure there are no null values")
+    log(f" Make sure there are no null values")
     # Make sure there are no null values
     df['billsec'] = pd.to_numeric(df['billsec'], errors='coerce').fillna(0)
     
@@ -48,14 +47,15 @@ def transform(df, deep=0):
         0,
         np.maximum(3, np.ceil(df['billsec'] / 6 * 1.3))
     )
-    # log(f" Condition for callresult 1 and 5 ")
+    log(f" Condition for callresult 1 and 5 ")
     # Condition for callresult 1 and 5 
     df['is_agent_call'] = (df['callresult'] == 1).astype(int)
     df['is_drop']       = (df['callresult'] == 5).astype(int)
 
-    # log(f" Grouping Day ")
+    log(f" Grouping")
     
     if (deep == 0):
+        log(f" Grouping by Day")
         df_day = df.groupby(['tenantid', 'camp_id', 'year', 'month', 'day' ]).agg(
             agents=('agentid', 'nunique'),
             totalcalls=('callid', 'count'),
@@ -72,6 +72,7 @@ def transform(df, deep=0):
         
         df_day['billsec'] *= 1.3
     elif (deep == 1):
+        log(f" Grouping by Month")
         df_day = df.groupby(['tenantid', 'camp_id', 'year', 'month' ]).agg(
             agents=('agentid', 'nunique'),
             totalcalls=('callid', 'count'),
