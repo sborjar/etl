@@ -22,7 +22,7 @@ def transform(df, deep=0):
     
     # start time to elapsed 
     start_time = time.perf_counter()
-
+    # print(df.head(5))
     # Convert calldate to datetime format
     log(f" Convert calldate to datetime format")
     df["calldate"] = pd.to_datetime(df["calldate"])

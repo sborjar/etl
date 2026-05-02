@@ -46,7 +46,7 @@ def loaddata(date_obj):
         
         month = date_obj[:7]
         file_path = f"data/general_{month}.csv"  
-        with open(file_path, 'a', newline='', encoding='utf-8') as f:
+        with open(file_path, 'a', newline='', encoding='latin1') as f:
            writer = csv.writer(f)
            column_headers = [i[0] for i in cursor.description]
            writer.writerow(column_headers)
