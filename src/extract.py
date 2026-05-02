@@ -46,12 +46,24 @@ def loaddata(date_obj):
         
         month = date_obj[:7]
         file_path = f"data/general_{month}.csv"  
+        file_exists = os.path.isfile(file_path)
+        log(f" file_exists {file_exists}")
+        
         with open(file_path, 'a', newline='', encoding='latin1') as f:
-           writer = csv.writer(f)
-           column_headers = [i[0] for i in cursor.description]
-           writer.writerow(column_headers)
-           writer.writerows(rows)
-           df = pd.DataFrame(rows, columns=column_headers)
+            writer = csv.writer(f)
+            
+            # Obtener nombres de columnas desde el cursor
+            column_headers = [i[0] for i in cursor.description]
+            
+            # SOLO escribir encabezado si el archivo es NUEVO
+            if not file_exists:
+                writer.writerow(column_headers)
+            
+            # Escribir los datos (siempre)
+            if rows:
+                writer.writerows(rows)
+                
+            df = pd.DataFrame(rows, columns=column_headers)
     
         end_time = time.perf_counter()
         elapsed_time2 = end_time - start_time
