@@ -7,24 +7,17 @@ import pymysql
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 from src.db.connection import db
-from src.funcs import log
+from src.funcs import log, logT
 from src.transform import transform
+from src.config import Config
 
-# load_dotenv()
-# mode = os.getenv("MODE", "SNBX")
-# user = os.getenv(f"DB_USER_{mode}", "SNBX")
-# password = os.getenv(f"DB_PASS_{mode}", "SNBX")
-# host = os.getenv(f"DB_HOST_{mode}", "SNBX")
-# database = os.getenv("DB_NAME", "SNBX")
-# engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}/{database}")
-
-def loaddata(date_obj):
+def downloadData(date_obj, df_agents):
     """ It retrieves the raw data from the calls, tenant, dialer_campaigns, and users tables.  """
     
     cursor = db.cursor()
 
-    log(f'--------------------------------------')
-    log(f' DATE: {date_obj}')
+    log(f' BEGIN EXTRACT', "", 1)
+    log(f' DATE: {date_obj}', "", 2)
 
     """ QUERY """
     query = "SELECT callid, tenantid, camp_id, calldate, callresult, agentdisp, agentid, calltype, callduration, billsec, waiting, talked, wrapped, sla, dispositioned FROM calls WHERE DATE(calldate) = %s"
@@ -34,51 +27,59 @@ def loaddata(date_obj):
 
     cursor.execute(query, param)
     rows = cursor.fetchall()
-
+    end_time = time.perf_counter()
+    elapsed_time1 = end_time - start_time
+    log(f' Elapsed query = {elapsed_time1} seconds', "", 2)
+        
+    logT(f"Query date {date_obj}",len(rows),elapsed_time1)
+    
     if len(rows)>0:
-        end_time = time.perf_counter()
-    
-        elapsed_time1 = end_time - start_time
-    
-        log(f' Elapsed query = {elapsed_time1} seconds')
-    
-        start_time = time.perf_counter()
+        column_headers = [i[0] for i in cursor.description]
+        df_day = pd.DataFrame(rows, columns=column_headers)
+        df = df_day.merge(df_agents, on="agentid")
         
         month = date_obj[:7]
-        file_path = f"data/general_{month}.csv"  
-        file_exists = os.path.isfile(file_path)
-        log(f" file_exists {file_exists}")
+        file_path = Config.DATA_DIR / f"general_{month}.csv"
         
-        with open(file_path, 'a', newline='', encoding='latin1') as f:
-            writer = csv.writer(f)
+        df.to_csv(file_path, mode='a', index=False)
+        
+        # start_time = time.perf_counter()
+        
+        # month = date_obj[:7]
+        # file_path = f"data/general_{month}.csv"  
+        # file_exists = os.path.isfile(file_path)
+        # log(f" file_exists {file_exists}", "", 2)
+        
+        # with open(file_path, 'a', newline='', encoding='latin1') as f:
+        #     writer = csv.writer(f)
             
-            # Obtener nombres de columnas desde el cursor
-            column_headers = [i[0] for i in cursor.description]
+        #     """ Get column names """
+        #     column_headers = [i[0] for i in cursor.description]
             
-            # SOLO escribir encabezado si el archivo es NUEVO
-            if not file_exists:
-                writer.writerow(column_headers)
+        #     if not file_exists:
+        #         writer.writerow(column_headers)
             
-            # Escribir los datos (siempre)
-            if rows:
-                writer.writerows(rows)
+        #     if rows:
+        #         writer.writerows(rows)
                 
-            df = pd.DataFrame(rows, columns=column_headers)
+        #     df_day = pd.DataFrame(rows, columns=column_headers)
+        #     df = df_day.merge(df_agents, on="agentid")
     
-        end_time = time.perf_counter()
-        elapsed_time2 = end_time - start_time
+        # end_time = time.perf_counter()
+        # elapsed_time2 = end_time - start_time
     
-        log(f" Row exported = {len(rows)} rows")
-        log(f" Elapsed exported = {elapsed_time2} seconds")
+        # log(f" Row exported = {len(rows)} rows", "", 2)
+        # log(f" Elapsed exported = {elapsed_time2} seconds", "", 2)
+        # log(f" END EXTRACT", "", 1)
     
-        transform(df)
+        # transform(df)
     else:
-        log(f" There are no records for {date_obj}", "error")
+        log(f" There are no records for {date_obj}", "error", 2)
 
 
 
 
-# def loaddata(date_obj):
+# def downloadData(date_obj):
 #     """ It retrieves the raw data from the calls, tenant, dialer_campaigns, and users tables.  """
     
 #     log(f' >>> EXTRACTION')

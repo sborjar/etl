@@ -1,7 +1,8 @@
-
 import logging
 from datetime import datetime
 import os
+import csv
+
 
 if not os.path.exists("logs"):
     os.makedirs("logs")
@@ -14,9 +15,20 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(message)s'
 )
 
-def log(msg, type=""):
+def log(msg, type="", level = 2):
+    spaces = ""
+    for s in range(level):
+        spaces += "  "
+        
+    msg = spaces + msg 
     print(msg)
     if type=="":
         logger.info(msg)
     elif type =="error":
         logger.error(msg)
+
+def logT(description,value="",elapsed=""):
+    current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    file_path = f"logs/statistics.md"
+    with open(file_path, 'a', newline='', encoding='utf-8') as f:
+        f.write(f'| {current_date} | {description} | {value} | {elapsed} |\n')

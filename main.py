@@ -8,75 +8,42 @@ import pandas as pd
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from src.delivery import delivery
+from src.menu import showMenu
+from src.presentation import showPresentation
+from src.funcs import log
 
 def main():
     
-    print("")
-    print("")
-    print("█████  █████  ██     ██     █████  ██ ██  █████ ")
-    print("██░░░░ ██░██░ ██░    ██░    ██░░░░ ██░██░ ██░██░")
-    print("██░    █████░ ██░    ██░    █████  ██░██░ ██░██░")
-    print("██░    ██░██░ ██░    ██░    ██░░░░ ██░██░ ██░██░")
-    print("█████  ██░██░ █████  █████  █████  █████░ █████░")
-    print(" ░░░░░  ░░ ░░  ░░░░░  ░░░░░  ░░░░░  ░░░░░  ░░░░░")
-    print("")
-    print(" CALLEVO INC.")
-    print(" ETL - EXTRACT, TRANSFORM AND LOAD")
-    print(" Callevo Development Team")
-    print(" Copyright (c) Callevo Inc, 2026")
-    print(" Version 1.0")
+    showPresentation()
     
     if len(sys.argv) > 1:
-        # print(f"Argumentos recibidos: {sys.argv[1:]}")
-
-        action = sys.argv[1]
-        d1 = ""
-        d2 = ""
-
-        if action == 'r':
-            """ Date range """
-            d1 = sys.argv[2]
-            d2 = sys.argv[3]
-
-        elif action == 'd':
-            """ Search by a single date """
-            d1 = sys.argv[2]
+        """ 
+            Callevo ETL
+            Extract, Transform and Load Process 
             
-        elif action == 's':
-            """ Calculate the summary """
-            d1 = sys.argv[2]
-            d2 = sys.argv[3]
-        
-        elif action == 'h':
-            print("")
-            print("")
-            print(" The Callevo ETL application accepts up to three arguments separated by spaces.")
-            print(" The first argument is the action:")
-            print("")
-            print(" r       Date range; must include two arguments: the start date and the end date.")
-            print(" d       Process will run for a single day; a second argument is expected.")
-            print(" s       Process the entire month to generate the summary; must include two arguments: the start date and the end date.")
-            print(" h       Displays help")
-            print("")
-            print(" The app will process data on a daily basis and generate statistics.")
-            print("")
-            print(" Examples:")
-            print(" python main.py r 2026-04-01 2026-04-26")
-            print(" python main.py d 2026-04-14")
-            print(" python main.py s 2026-01-01 2026-04-30")
-            print(" python main.py h")
-            print("")
-            print("")
-            
-        else:
-            print("Wrong parameters.")
-            exit(1)
-        
-        if action != 'h':
-            delivery(action,d1,d2)
+            Args:
+                action: Action type ('d', 'r', 's')
+                date1: Start date (yyyy-mm-dd)
+                date2: End date (yyyy-mm-dd)
+        """
+
+        try:
+            action = sys.argv[1]
+            d1 = sys.argv[2] 
+            if action in ('r','s'):
+                d2 = sys.argv[3] 
+            if action in ('d'):
+                d2 = d1    
+        except Exception as err:
+            showMenu()
+            log(f"Error: Arguments validation, {err}","error",0)
+            exit()
+    
+        delivery(action,d1,d2)
                 
     else:
-        log("You need to set the execution parameters. Check the help by typing << python main.py h >>")
+        showMenu()
+        log(f"Error: It is running without arguments","error",0)
 
 if __name__ == "__main__":
     main()

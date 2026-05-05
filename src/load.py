@@ -25,7 +25,7 @@ def loadDB(df, deep):
     """ 
     Function that retrieves information from the summary files and uploads it to the database
     """
-    log(f' >>> LOAD ')
+    log(f' LOAD', "", 1)
     start_time = time.perf_counter()
     
     if df is None or df.empty:
@@ -100,7 +100,10 @@ def loadDB(df, deep):
 
     end_time = time.perf_counter()
     elapsed_time = end_time - start_time
+    logT('LOAD',df.shape[0],elapsed_time)
     if deep == 0:
         log(f" Elapsed LOAD {elapsed_time} second ")
     elif deep == 1:
         log(f" Elapsed SUMMARY LOAD {elapsed_time} second ")
+    
+    log(f' END LOAD', "", 1)

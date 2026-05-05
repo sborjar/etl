@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import time
 
-from src.funcs import log
+from src.funcs import log, logT
 from src.transform import transform
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -24,8 +24,6 @@ def collect(date1, date2):
     """ 
     Function that transforms the extracted date for processing into billing information.
     """
-
-    
     date_range = pd.date_range(start=date1, end=date2)
     date_list = date_range.strftime('%Y-%m').tolist()
     # unique_dates = list(set(date_list))
@@ -44,6 +42,7 @@ def collect(date1, date2):
         end_time = time.perf_counter()
         elapsed_time_load = end_time - start_time
         log(f" Elapsed file {file} = {elapsed_time_load} seconds")
+        logT(f'File {file}',df.shape[0],elapsed_time_load)
 
         if df is None or df.empty:
             log(f" The file is empty or does not exist")

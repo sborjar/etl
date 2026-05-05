@@ -3,59 +3,65 @@ import pandas as pd
 import os
 import time
 import polars as pl
-from src.funcs import log
+from src.funcs import log,logT
 from src.load import loadDB
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def transform(df, deep=0):
-    """ 
-    Function that transforms the extracted date for processing into billing information.
-    """
+    """Transform and aggregate data.
+
+        Args:
+            df: Input DataFrame (pandas, polars, or pyspark)
+            deep: Aggregation level (0 = daily, 1 = monthly)
+
+        Returns:
+            Transformed DataFrame
+        """
     
-    log(f' >>> TRANSFORM ')
+    log(f' BEGIN TRANSFORM', "", 1)
     
+    """ Valitate is empty the data frame """
     if df is None or df.empty:
-        log(f" The Data frame comes empty")
+        log(f" The Data frame comes empty", "error")
         return None
     
-    # start time to elapsed 
+    
+    """ Start time to elapsed """
     start_time = time.perf_counter()
     
-    # 1. Convert calldate to datetime format
-    log(f" Convert calldate to datetime format")
-    df["calldate"] = pd.to_datetime(df["calldate"], errors='coerce')
+    
+    
 
-    # 2. ELIMINAR FILAS CON FECHAS INVÁLIDAS (Crucial para evitar el error IntCastingNaN)
-    # Si calldate es NaT, no podemos extraer año/mes/día válidos.
+    """ Validation when calldate is NAT or not valid """
     initial_rows = len(df)
     df.dropna(subset=['calldate'], inplace=True)
     dropped_rows = initial_rows - len(df)
     if dropped_rows > 0:
         log(f" Dropped {dropped_rows} rows with invalid dates.")
-
-    # -----------------
-    # Preparation
-    # ----------------
-    log(f" Add columns year, month, day")
-    # Ahora sí es seguro convertir a int32 porque no hay NaN en calldate
-    df["year"] =  df['calldate'].dt.year.astype(np.int32)
-    df["month"] =  df['calldate'].dt.month.astype(np.int32)
-    df["day"] =  df['calldate'].dt.day.astype(np.int32)
     
     log(f" Make sure there are no null values in numeric cols")
-    # Asegurar tipos numéricos estándar (float64/int64) para evitar errores con Polars
+    """ Make sure there are no null values in numeric cols """
     numeric_cols = ['billsec', 'waiting', 'talked', 'wrapped', 'sla', 'dispositioned']
     for col in numeric_cols:
         if col in df.columns:
             # fillna(0) asegura que no haya NaN, permitiendo convertir a float64/int64 estándar
             df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
             
-    # Cost calculation
-    # Asegurarse que billsec sea numérico antes de operar
-    df['billsec'] = pd.to_numeric(df['billsec'], errors='coerce').fillna(0)
+    """ Ensure the calldate is datetime format """
+    log(f" Ensure the calldate is datetime format ")
+    df["calldate"] = pd.to_datetime(df["calldate"], errors='coerce')
+
+    """ Add year, month, day columns from calldate. """
+    log(f" Add year, month, day columns from calldate.")
+    # Ahora sí es seguro convertir a int32 porque no hay NaN en calldate
+    df["year"] =  df['calldate'].dt.year.astype(np.int32)
+    df["month"] =  df['calldate'].dt.month.astype(np.int32)
+    df["day"] =  df['calldate'].dt.day.astype(np.int32)
     
+    """ UNITS """
+    log(f" Units calculation")
     df['units_calc'] = np.where(
         df['billsec'] == 0,
         0,
@@ -138,9 +144,13 @@ def transform(df, deep=0):
     end_time = time.perf_counter()
     elapsed_time_transform = end_time - start_time
     
+    logT('TRANSFORM',df_day.shape[0],elapsed_total)
+    
     if deep == 0:
         log(f" Elapsed TRANSFORM {elapsed_time_transform:.4f} seconds ")
     elif deep == 1:
         log(f" Elapsed SUMMARY TRANSFORM (Polars) {elapsed_time_transform:.4f} seconds ")
+    
+    log(f' END TRANSFORM', "", 1)
     
     loadDB(df_day, deep)
