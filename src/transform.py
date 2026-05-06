@@ -2,18 +2,17 @@ import numpy as np
 import pandas as pd
 import os
 import time
-import polars as pl
 from src.funcs import log,logT
 from src.load import loadDB
+from src.config import Config
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-
 
 def transform(df, deep=0):
     """Transform and aggregate data.
 
         Args:
-            df: Input DataFrame (pandas, polars, or pyspark)
+            df: Input DataFrame 
             deep: Aggregation level (0 = daily, 1 = monthly)
 
         Returns:
@@ -30,8 +29,6 @@ def transform(df, deep=0):
     
     """ Start time to elapsed """
     start_time = time.perf_counter()
-    
-    
     
 
     """ Validation when calldate is NAT or not valid """
@@ -68,89 +65,99 @@ def transform(df, deep=0):
         np.maximum(3, np.ceil(df['billsec'] / 6 * 1.3))
     )
     
-    log(f" Condition for callresult 1 and 5 ")
-    # Condition for callresult 1 and 5 
-    df['is_agent_call'] = (df['callresult'] == 1).astype(np.int8)
-    df['is_drop']       = (df['callresult'] == 5).astype(np.int8)
+    # if 'agentid' in df.columns:
+    #     if df['agentid'].dtype == 'object':
+    #         df['agentid'] = df['agentid'].fillna('UNKNOWN')
+    #     else:
+    #         df['agentid'] = df['agentid'].fillna(-1).astype(np.int64)
+
+    
+    if 'callid' in df.columns:
+            df['callid'] = df['callid'].fillna(0) 
+    
+    """ Conditions """
+    df['agenthandled_calc'] = np.where(df["agentid"] > 0, 1, 0)
+    df['noanswers_calc'] = np.where(df["callresult"] == 2, 1, 0)
+    df['busy_calc'] = np.where(df["callresult"] == 3, 1, 0)
+    df['oi_calc'] = np.where(df["callresult"] == 4, 1, 0)
+    df['drops_calc'] = np.where(df["callresult"] == 5, 1, 0)
+    df['amd_calc'] = np.where(df["callresult"] == 6, 1, 0)
+    df['others_calc'] = np.where((df["callresult"] < 1) & (df['callresult'] > 6), 1, 0)
+    df['contact_calc'] = np.where((df["callresult"] == 1) & (df['contact'] == 'y'),1,0)
+    df['success_calc'] = np.where((df["callresult"] == 1) & (df['success'] == 'y'),1,0)
 
     log(f" Grouping")
     
     if deep == 0:
         log(f" Grouping by Day")
-        df_day = df.groupby(['tenantid', 'camp_id', 'year', 'month', 'day']).agg(
-            agents=('agentid', 'nunique'),
-            totalcalls=('callid', 'count'),
-            totalagentcalls=('is_agent_call', 'sum'),
-            totaldrops=('is_drop', 'sum'),
-            billsec=('billsec', 'sum'),
-            units=('units_calc', 'sum'),
-            waiting=('waiting', 'sum'),
-            talked=('talked', 'sum'),
-            wrapped=('wrapped', 'sum'),
-            sla=('sla', 'sum'),
-            dispositioned=('dispositioned', 'sum')
-        ).reset_index()
-        
-        df_day['billsec'] *= 1.3
-
+        header_group =  ['tenantid', 'camp_id', 'year', 'month', 'day']
     elif deep == 1:
-        log(f" Preparing DataFrame for Polars conversion")
-        
-        # --- LIMPIEZA FINAL PARA POLARS ---
-        # Polars es estricto con los tipos. Aseguramos que no queden NaNs en columnas clave.
-        
-        # 1. Limpiar agentid para el nunique
-        if 'agentid' in df.columns:
-            # Si agentid tiene NaN, nunique los ignora por defecto en Pandas, 
-            # pero en Polars puede ser tricky si el tipo es object con None.
-            # Lo más seguro es rellenar con un placeholder si es string, o 0 si es numérico.
-            if df['agentid'].dtype == 'object':
-                df['agentid'] = df['agentid'].fillna('UNKNOWN')
-            else:
-                df['agentid'] = df['agentid'].fillna(-1).astype(np.int64)
-        
-        # 2. Asegurar que callid no tenga NaNs para el count
-        if 'callid' in df.columns:
-             df['callid'] = df['callid'].fillna(0) # O algún ID dummy
-
-        # 3. Convertir a Polars
-        try:
-            df_pl = pl.from_pandas(df)
-        except Exception as e:
-            log(f" Error converting to Polars: {e}")
-            log(" Fallback: Printing dtypes to debug")
-            log(df.dtypes)
-            raise e
-
-        log(f" Grouping by Month with Polars")
-        # Sintaxis correcta de Polars para agg
-        df_day_pl = df_pl.group_by(['tenantid', 'camp_id', 'year', 'month']).agg([
-            pl.col('agentid').n_unique().alias('agents'),
-            pl.col('callid').count().alias('totalcalls'),
-            pl.col('is_agent_call').sum().alias('totalagentcalls'),
-            pl.col('is_drop').sum().alias('totaldrops'),
-            pl.col('billsec').sum().alias('billsec'),
-            pl.col('units_calc').sum().alias('units'),
-            pl.col('waiting').sum().alias('waiting'),
-            pl.col('talked').sum().alias('talked'),
-            pl.col('wrapped').sum().alias('wrapped'),
-            pl.col('sla').sum().alias('sla'),
-            pl.col('dispositioned').sum().alias('dispositioned')
-        ])
-        
-        df_day = df_day_pl.to_pandas()
-        df_day['billsec'] *= 1.3
+        header_group =  ['tenantid', 'camp_id', 'year', 'month']
+    
+    
+    df_day = df.groupby(
+        header_group,
+        as_index=False,
+        sort=False
+    ).agg(
+        agents=('agentid', 'nunique'),
+        # totalcalls=('callid', 'count'),
+        agenthandled=('agenthandled_calc', 'sum'),
+        noanswers=('noanswers_calc', 'sum'),
+        busy=('busy_calc', 'sum'),
+        oi=('oi_calc', 'sum'),
+        drops=('drops_calc', 'sum'),
+        amd=('amd_calc', 'sum'),
+        others=('others_calc', 'sum'),
+        contacts=('contact_calc', 'sum'),
+        success=('success_calc', 'sum'),
+        waiting=('waiting', 'sum'),
+        talked=('talked', 'sum'),
+        wrapped=('wrapped', 'sum'),
+        sla=('sla', 'sum'),
+        # dispositioned=('dispositioned', lambda x: x.astype(bool).sum()),
+        billsec=('billsec', lambda x: (x * 1.3).sum()),
+        units=('units_calc', 'sum')
+        # agenthandled=('agentid', lambda x: (x > 0).sum()),
+        # noanswers=('callresult', lambda x: (x == 2).sum()),
+        # busy=('callresult', lambda x: (x == 3).sum()),
+        # oi=('callresult', lambda x: (x == 4).sum()),
+        # drops=('callresult', lambda x: (x == 5).sum()),
+        # amd=('callresult', lambda x: (x == 6).sum()),
+        # others=('callresult', lambda x: (~x.isin([1, 2, 3, 4, 5, 6])).sum()),
+        # contacts=('contact_calc', 'sum'),
+        # success=('success_calc', 'sum'),
+        # waiting=('waiting', 'sum'),
+        # talked=('talked', 'sum'),
+        # wrapped=('wrapped', 'sum'),
+        # sla=('sla', 'sum'),
+        # # dispositioned=('dispositioned', lambda x: x.astype(bool).sum()),
+        # billsec=('billsec', lambda x: (x * 1.3).sum()),
+        # units=('billsec', unitsCall)
+    )
 
     end_time = time.perf_counter()
     elapsed_time_transform = end_time - start_time
-    
-    logT('TRANSFORM',df_day.shape[0],elapsed_total)
+    print(df_day.head(5))
+    logT('TRANSFORM',df_day.shape[0],elapsed_time_transform)
     
     if deep == 0:
         log(f" Elapsed TRANSFORM {elapsed_time_transform:.4f} seconds ")
     elif deep == 1:
-        log(f" Elapsed SUMMARY TRANSFORM (Polars) {elapsed_time_transform:.4f} seconds ")
+        log(f" Elapsed SUMMARY TRANSFORM {elapsed_time_transform:.4f} seconds ")
+    
+
+    # file_path = Config.DATA_DIR / f"transform.csv"
+    # df_day.to_csv(file_path, mode='w',  lineterminator='\n', encoding='latin1', index=False)
     
     log(f' END TRANSFORM', "", 1)
-    
     loadDB(df_day, deep)
+    
+    
+# def unitsCall(billsec_series: pd.Series):
+#     total = 0.0
+#     for billsec in billsec_series:
+#         if billsec == 0:
+#             continue
+#         total += max(3, int(np.ceil(billsec / 6 * 1.3)))
+#     return total

@@ -32,7 +32,7 @@ def collect(date1, date2):
     log(f" List of date ranges to summary calculation {unique_dates}")
     
     for date in unique_dates:
-        log(f' >>> SUMMARY ')
+        log(f' SUMMARY ',"",1)
         log(f' Date: {date}')
         
         """ Load general file """

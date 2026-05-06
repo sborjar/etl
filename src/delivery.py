@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from src.extract import downloadData
 from src.funcs import log, logT
 from src.agents import getAgents
+from src.disposition import getDisposition
 from src.summary import collect
 
 
@@ -26,6 +27,7 @@ def delivery(action,date1,date2):
     """
     
     log(f' BEGIN', "", 0)
+    logT(f'--- BEGIN',date1,date2)
     log(f' Action: {action}', "", 1)
     log(f' Date1: {date1}', "", 1)
     log(f' Date2: {date2}', "", 1)
@@ -42,24 +44,25 @@ def delivery(action,date1,date2):
     
     if action in ('d', 'r'):
         df_agents = getAgents()
+        df_disp = getDisposition()
         date_range = pd.date_range(start=date1, end=date2)
         date_list = date_range.strftime('%Y-%m-%d').tolist()
-        log(f" List of date ranges {date_list}")
+        log(f" DATE RANGE {date_list}","",1)
         for date in date_list:
-            downloadData(date, df_agents)
+            downloadData(date, df_agents, df_disp)
     elif action=="s":
         if date2 == "":
             date2 = date1
         
     """ Summary """
-    # collect(date1,date2)
+    collect(date1,date2)
         
     end_time_total = time.perf_counter()
     elapsed_total = end_time_total - start_time_total
     
-    log(f' >>> TOTALS')
+    log(f' TOTALS', "", 1)
     log(f" Date                                 {date1} {date2}")
     log(f" Elapsed General                      {elapsed_total} seconds")
     log(f' END',"", 0)
-    logT(f' Elapsed General',"",elapsed_total)
-    logT(f' END',date1,date2)
+    logT(f'Elapsed General',"",elapsed_total)
+    logT(f'--- END',date1,date2)

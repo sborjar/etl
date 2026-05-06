@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 import pymysql
 from dotenv import load_dotenv
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-from src.funcs import log
+from src.funcs import log, logT
 from src.db.connection import db
 
 load_dotenv()

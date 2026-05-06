@@ -11,7 +11,7 @@ from src.funcs import log, logT
 from src.transform import transform
 from src.config import Config
 
-def downloadData(date_obj, df_agents):
+def downloadData(date_obj, df_agents, df_disp):
     """ It retrieves the raw data from the calls, tenant, dialer_campaigns, and users tables.  """
     
     cursor = db.cursor()
@@ -36,43 +36,17 @@ def downloadData(date_obj, df_agents):
     if len(rows)>0:
         column_headers = [i[0] for i in cursor.description]
         df_day = pd.DataFrame(rows, columns=column_headers)
-        df = df_day.merge(df_agents, on="agentid")
+        df_temp = df_day.merge(df_agents, on="agentid")
+        df = df_temp.merge(df_disp, on="agentdisp")
         
         month = date_obj[:7]
         file_path = Config.DATA_DIR / f"general_{month}.csv"
         
-        df.to_csv(file_path, mode='a', index=False)
+        df.to_csv(file_path, mode='a',  lineterminator='\n', index=False)
         
-        # start_time = time.perf_counter()
-        
-        # month = date_obj[:7]
-        # file_path = f"data/general_{month}.csv"  
-        # file_exists = os.path.isfile(file_path)
-        # log(f" file_exists {file_exists}", "", 2)
-        
-        # with open(file_path, 'a', newline='', encoding='latin1') as f:
-        #     writer = csv.writer(f)
-            
-        #     """ Get column names """
-        #     column_headers = [i[0] for i in cursor.description]
-            
-        #     if not file_exists:
-        #         writer.writerow(column_headers)
-            
-        #     if rows:
-        #         writer.writerows(rows)
-                
-        #     df_day = pd.DataFrame(rows, columns=column_headers)
-        #     df = df_day.merge(df_agents, on="agentid")
+        log(f" END EXTRACT", "", 1)
     
-        # end_time = time.perf_counter()
-        # elapsed_time2 = end_time - start_time
-    
-        # log(f" Row exported = {len(rows)} rows", "", 2)
-        # log(f" Elapsed exported = {elapsed_time2} seconds", "", 2)
-        # log(f" END EXTRACT", "", 1)
-    
-        # transform(df)
+        transform(df)
     else:
         log(f" There are no records for {date_obj}", "error", 2)
 

@@ -8,28 +8,17 @@ from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 from src.db.connection import db
 from src.funcs import log, logT
-from src.config import Config
+# from src.config import Config
 
-def getAgents():
+def getDisposition():
     """ It retrieves the raw data from the users"""
     
     cursor = db.cursor()
 
-    log(f' AGENTS',"",1)
+    log(f' DISPOSITION',"",1)
 
     """ QUERY """
-    query = """SELECT 
-            a.agentid,
-            u.usertype,
-            t.activate_tenant
-        FROM
-            agents a
-                INNER JOIN users u ON u.userid = a.userid 
-                INNER JOIN tenant t ON t.tenantid = a.tenantid
-        AND 
-            u.usertype = 27
-            AND t.activate_tenant = 'y'
-    """
+    query = "SELECT dispid as agentdisp, success, contact FROM disposition order by dispid"
     start_time = time.perf_counter()
     cursor.execute(query)
     rows = cursor.fetchall()
@@ -37,7 +26,7 @@ def getAgents():
     elapsed_time1 = end_time - start_time
     log(f' Elapsed query = {elapsed_time1} seconds')
     log(f" Row exported = {len(rows)} rows")
-    logT("Agents",len(rows),elapsed_time1)
+    logT("Disposition",len(rows),elapsed_time1)
     
     if len(rows)>0:
         start_time = time.perf_counter()

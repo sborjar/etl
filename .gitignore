@@ -9,3 +9,5 @@ requirements.txt
 *.csv
 *.txt
 *.sh
+*.mermaid
+*.md
