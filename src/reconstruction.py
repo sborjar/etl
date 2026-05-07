@@ -7,8 +7,6 @@ import pymysql
 from dotenv import load_dotenv
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
-
-
 load_dotenv()
 mode = os.getenv("MODE", "SNBX")
 user = os.getenv(f"DB_USER_{mode}", "SNBX")
@@ -33,18 +31,25 @@ def load_data(nfile):
         log(f"Error: No se encontro el archivo {PROCESSED_FILE}")
         return None
 
-
 def init():
+    """ 
+    Este es un programa independiente de todo para reconstruir (restaurar) datos desde archivos csv, 
+    esto quiere decir,  que se lee cada archivo general_*.* que son los fuentes (data extraida desde 
+    la base y guardada como respaldo) y se subre a la tabla calls. 
+    """
     folder = 'data/'
-    filter = os.path.join(folder, 'calls_*')
+    filter = os.path.join(folder, 'general_2026-05*')
     files = glob.glob(filter)
     
     log(" CREATE ENGINE")
     engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}/{database}")
-
     
     for file in files:
+        """ Se carga el archivo """
         df = load_data(file)
+        """ Se eliminan columnas que no son de calls """
+        df.drop(columns=["usertype","activate_tenant","success","contact"], inplace=True)
+        """ Se sube el contenido resultante a la tabla calls """
         df.to_sql(
             name='calls', 
             con=engine, 

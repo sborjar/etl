@@ -27,8 +27,8 @@ def log(msg, type="", level = 2):
     elif type =="error":
         logger.error(msg)
 
-def logT(description,value="",elapsed=""):
+def logT(description,elapsed=""):
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     file_path = f"logs/statistics.md"
     with open(file_path, 'a', newline='', encoding='utf-8') as f:
-        f.write(f'| {current_date} | {description} | {value} | {elapsed} |\n')
+        f.write(f'| {current_date} | {description} | {elapsed} |\n')

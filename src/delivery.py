@@ -69,5 +69,5 @@ def delivery(action,date1,date2):
     log(f" Time end                             {hour_end}")
     log(f" Elapsed General                      {elapsed_total} seconds")
     log(f' END',"", 0)
-    logT(f'Elapsed General',"",elapsed_total)
+    logT(f'Action: {action} (d-day, r-range, s-summary), Date: from {date1} to {date2}',elapsed_total)
     # logT(f'--- END',date1,date2)
