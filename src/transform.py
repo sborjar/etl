@@ -65,35 +65,41 @@ def transform(df, deep=0):
         np.maximum(3, np.ceil(df['billsec'] / 6 * 1.3))
     )
     
-    # if 'agentid' in df.columns:
-    #     if df['agentid'].dtype == 'object':
-    #         df['agentid'] = df['agentid'].fillna('UNKNOWN')
-    #     else:
-    #         df['agentid'] = df['agentid'].fillna(-1).astype(np.int64)
-
-    
     if 'callid' in df.columns:
             df['callid'] = df['callid'].fillna(0) 
     
-    """ Conditions """
+    """ Conditionals 
+    so we shuld sum callresult=1 is Person (meaning the answering machine detction determined it was a person)..doesn't really mean it was handled by an agent.  I prefer to use agentid>0 to determine agenthandled
+    sum callersult=2 as NoAnswers
+    sum callersult=3 as Busy
+    sum callersult=4 as OI
+    sum callresult=5 as Drop
+    sum callresult=6 as AMD
+    Sum callresult<>(1-6) as Others
+    and add those to the table
+    in addition we need to add these counts
+    sum (callresult=1 and disposition.contact='y') as contacts
+    sum (callresult-=1 and disposition.success='y') as success
+    remember that Agents disposition AMD's so that's why you can't use callresult=1 to determine agenthandled
+    """
     df['agenthandled_calc'] = np.where(df["agentid"] > 0, 1, 0)
-    df['noanswers_calc'] = np.where(df["callresult"] == 2, 1, 0)
-    df['busy_calc'] = np.where(df["callresult"] == 3, 1, 0)
-    df['oi_calc'] = np.where(df["callresult"] == 4, 1, 0)
-    df['drops_calc'] = np.where(df["callresult"] == 5, 1, 0)
-    df['amd_calc'] = np.where(df["callresult"] == 6, 1, 0)
-    df['others_calc'] = np.where((df["callresult"] < 1) & (df['callresult'] > 6), 1, 0)
-    df['contact_calc'] = np.where((df["callresult"] == 1) & (df['contact'] == 'y'),1,0)
-    df['success_calc'] = np.where((df["callresult"] == 1) & (df['success'] == 'y'),1,0)
+    df['noanswers_calc']    = np.where(df["callresult"] == 2, 1, 0)
+    df['busy_calc']         = np.where(df["callresult"] == 3, 1, 0)
+    df['oi_calc']           = np.where(df["callresult"] == 4, 1, 0)
+    df['drops_calc']        = np.where(df["callresult"] == 5, 1, 0)
+    df['amd_calc']          = np.where(df["callresult"] == 6, 1, 0)
+    df['others_calc']       = np.where((df["callresult"] < 1) & (df['callresult'] > 6), 1, 0)
+    df['contact_calc']      = np.where((df["callresult"] == 1) & (df['contact'] == 'y'),1,0)
+    df['success_calc']      = np.where((df["callresult"] == 1) & (df['success'] == 'y'),1,0)
 
     log(f" Grouping")
     
     if deep == 0:
-        log(f" Grouping by Day")
+        log(f" Summary by Day")
         header_group =  ['tenantid', 'camp_id', 'year', 'month', 'day']
     elif deep == 1:
+        log(f" Summary by Month")
         header_group =  ['tenantid', 'camp_id', 'year', 'month']
-    
     
     df_day = df.groupby(
         header_group,
@@ -101,7 +107,6 @@ def transform(df, deep=0):
         sort=False
     ).agg(
         agents=('agentid', 'nunique'),
-        # totalcalls=('callid', 'count'),
         agenthandled=('agenthandled_calc', 'sum'),
         noanswers=('noanswers_calc', 'sum'),
         busy=('busy_calc', 'sum'),

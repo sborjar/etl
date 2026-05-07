@@ -42,7 +42,11 @@ def collect(date1, date2):
         end_time = time.perf_counter()
         elapsed_time_load = end_time - start_time
         log(f" Elapsed file {file} = {elapsed_time_load} seconds")
-        logT(f'File {file}',df.shape[0],elapsed_time_load)
+        try:
+            logT(f'File {file}',len(df),elapsed_time_load)
+        except Exception as err:
+            logT(f'File {file}',err ,elapsed_time_load)
+            
 
         if df is None or df.empty:
             log(f" The file is empty or does not exist")

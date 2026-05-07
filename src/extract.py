@@ -34,19 +34,26 @@ def downloadData(date_obj, df_agents, df_disp):
     logT(f"Query date {date_obj}",len(rows),elapsed_time1)
     
     if len(rows)>0:
+        """ Determine the columns of the resulting records """
         column_headers = [i[0] for i in cursor.description]
+        
+        """ Create a dataframe from the resulting records """
         df_day = pd.DataFrame(rows, columns=column_headers)
+        
+        """ Combine two dataframes based on common columns and indexes """
         df_temp = df_day.merge(df_agents, on="agentid")
         df = df_temp.merge(df_disp, on="agentdisp")
         
+        """ Add the result to the master file """        
         month = date_obj[:7]
         file_path = Config.DATA_DIR / f"general_{month}.csv"
         
-        df.to_csv(file_path, mode='a',  lineterminator='\n', index=False)
+        """ Save the file """
+        df.to_csv(file_path, mode='a',  lineterminator='\n', index=False, header=not os.path.exists(file_path))
         
         log(f" END EXTRACT", "", 1)
     
-        transform(df)
+        # transform(df)
     else:
         log(f" There are no records for {date_obj}", "error", 2)
 

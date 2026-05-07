@@ -55,17 +55,24 @@ def loadDB(df, deep):
                     year = row["year"]
                     month = row["month"]
                     agents = row["agents"]
-                    totalcalls = row["totalcalls"]
-                    totalagentcalls = row["totalagentcalls"]
-                    totaldrops = row["totaldrops"]
-                    billsec = row["billsec"]
-                    units = row["units"]
+                    agenthandled = row["agenthandled"]
+                    noanswers = row["noanswers"]
+                    busy = row["busy"]
+                    oi = row["oi"]
+                    drops = row["drops"]
+                    amd = row["amd"]
+                    others = row["others"]
+                    contacts = row["contacts"]
+                    success = row["success"]
                     waiting = row["waiting"]
                     talked = row["talked"]
                     wrapped = row["wrapped"]
                     sla = row["sla"]
-                    dispositioned = row["dispositioned"]
+                    billsec = row["billsec"]
+                    units = row["units"]
                     
+                    # tenantid, camp_id, year, month, agents, agenthandled, noanswers, busy, oi, drops, amd, others, contacts, success, waiting, talked, wrapped, sla, billsec, units
+
                     cursor = db.cursor()
                     query = "SELECT * FROM billing_summary_campaign WHERE tenantid=%s AND camp_id=%s AND year=%s AND month=%s"
                     param = (tenantid, camp_id, year, month, )
@@ -76,18 +83,41 @@ def loadDB(df, deep):
                     if len(rows) > 0:
                         # log(f"--> UPDATE")
                         ## UPDATE
-                        query = "UPDATE billing_summary_campaign SET agents=%s, totalcalls=%s, totalagentcalls=%s, totaldrops=%s, billsec=%s, units=%s, waiting=%s, talked=%s, wrapped=%s, sla=%s, dispositioned=%s WHERE tenantid=%s AND camp_id=%s AND year=%s AND month=%s"
-                        param = (tenantid, camp_id, year, month, agents, totalcalls, totalagentcalls, totaldrops, billsec, units, waiting, talked, wrapped, sla, dispositioned, )
+                        query = """UPDATE billing_summary_campaign 
+                            SET 
+                                agents = %s, 
+                                agenthandled = %s, 
+                                noanswers = %s, 
+                                busy = %s, 
+                                oi = %s, 
+                                drops = %s, 
+                                amd = %s, 
+                                others = %s, 
+                                contacts = %s, 
+                                success = %s, 
+                                waiting = %s, 
+                                talked = %s, 
+                                wrapped = %s, 
+                                sla = %s, 
+                                billsec = %s, 
+                                units = %s
+                            WHERE 
+                                tenantid=%s AND camp_id=%s AND year=%s AND month=%s"""
+                        param = (agents, agenthandled, noanswers, busy, oi, 
+                            drops, amd, others, contacts, success, waiting,
+                            talked, wrapped, sla,billsec, units, tenantid, camp_id, year, month
+                        ,)
                         cursor = db.cursor()
                         cursor.execute(query, param)
                     else:
                         there_insert = True
                         # log(f"--> INSERT")
                         ## INSERT
-                        collection.append((tenantid, camp_id, year, month, agents, totalcalls, totalagentcalls, totaldrops, billsec, units, waiting, talked, wrapped, sla, dispositioned))
-                        query = "INSERT INTO billing_summary_campaign (tenantid, camp_id, year, month, agents, totalcalls, totalagentcalls, totaldrops, billsec, units, waiting, talked, wrapped, sla, dispositioned) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                        # param = (tenantid, camp_id, year, month, agents, totalcalls, totalagentcalls, totaldrops, billsec, units, waiting, talked, wrapped, sla, dispositioned, )
-                
+                        collection.append((tenantid, camp_id, year, month, agents, agenthandled, noanswers, busy, oi, drops, amd, others, contacts, success, waiting, talked, wrapped, sla, billsec, units))
+                        query = """INSERT INTO billing_summary_campaign (
+                            tenantid, camp_id, year, month, agents, agenthandled, noanswers, busy, oi, drops, amd, 
+                            others, contacts, success, waiting, talked, wrapped, sla, billsec, units
+                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
                 if there_insert:
                     cursor.executemany(query, collection)
                 
@@ -100,8 +130,8 @@ def loadDB(df, deep):
 
     end_time = time.perf_counter()
     elapsed_time = end_time - start_time
-    logT('LOAD',df.shape[0],elapsed_time)
     if deep == 0:
+        logT('LOAD',df.shape[0],elapsed_time)
         log(f" Elapsed LOAD {elapsed_time} second ")
     elif deep == 1:
         log(f" Elapsed SUMMARY LOAD {elapsed_time} second ")
