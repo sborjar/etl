@@ -30,8 +30,7 @@ def downloadData(date_obj, df_agents, df_disp):
     end_time = time.perf_counter()
     elapsed_time1 = end_time - start_time
     log(f' Elapsed query = {elapsed_time1} seconds', "", 2)
-        
-    logT(f"Query date {date_obj}",len(rows),elapsed_time1)
+    # logT(f"Query date {date_obj}",len(rows),elapsed_time1)
     
     if len(rows)>0:
         """ Determine the columns of the resulting records """
@@ -53,7 +52,7 @@ def downloadData(date_obj, df_agents, df_disp):
         
         log(f" END EXTRACT", "", 1)
     
-        # transform(df)
+        transform(df)
     else:
         log(f" There are no records for {date_obj}", "error", 2)
 

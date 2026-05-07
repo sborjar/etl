@@ -32,13 +32,14 @@ def transform(df, deep=0):
     
 
     """ Validation when calldate is NAT or not valid """
+    log(f" [x] Validation when calldate is NAT or not valid")
     initial_rows = len(df)
     df.dropna(subset=['calldate'], inplace=True)
     dropped_rows = initial_rows - len(df)
     if dropped_rows > 0:
         log(f" Dropped {dropped_rows} rows with invalid dates.")
     
-    log(f" Make sure there are no null values in numeric cols")
+    log(f" [x] Make sure there are no null values in numeric cols")
     """ Make sure there are no null values in numeric cols """
     numeric_cols = ['billsec', 'waiting', 'talked', 'wrapped', 'sla', 'dispositioned']
     for col in numeric_cols:
@@ -47,26 +48,23 @@ def transform(df, deep=0):
             df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
             
     """ Ensure the calldate is datetime format """
-    log(f" Ensure the calldate is datetime format ")
+    log(f" [x] Ensure the calldate is datetime format ")
     df["calldate"] = pd.to_datetime(df["calldate"], errors='coerce')
 
     """ Add year, month, day columns from calldate. """
-    log(f" Add year, month, day columns from calldate.")
+    log(f" [x] Add year, month, day columns from calldate.")
     # Ahora sí es seguro convertir a int32 porque no hay NaN en calldate
     df["year"] =  df['calldate'].dt.year.astype(np.int32)
     df["month"] =  df['calldate'].dt.month.astype(np.int32)
     df["day"] =  df['calldate'].dt.day.astype(np.int32)
     
     """ UNITS """
-    log(f" Units calculation")
+    log(f" [x] Units calculation")
     df['units_calc'] = np.where(
         df['billsec'] == 0,
         0,
         np.maximum(3, np.ceil(df['billsec'] / 6 * 1.3))
     )
-    
-    if 'callid' in df.columns:
-            df['callid'] = df['callid'].fillna(0) 
     
     """ Conditionals 
     so we shuld sum callresult=1 is Person (meaning the answering machine detction determined it was a person)..doesn't really mean it was handled by an agent.  I prefer to use agentid>0 to determine agenthandled
@@ -82,6 +80,7 @@ def transform(df, deep=0):
     sum (callresult-=1 and disposition.success='y') as success
     remember that Agents disposition AMD's so that's why you can't use callresult=1 to determine agenthandled
     """
+    log(f" [x] Conditionals")
     df['agenthandled_calc'] = np.where(df["agentid"] > 0, 1, 0)
     df['noanswers_calc']    = np.where(df["callresult"] == 2, 1, 0)
     df['busy_calc']         = np.where(df["callresult"] == 3, 1, 0)
@@ -92,13 +91,13 @@ def transform(df, deep=0):
     df['contact_calc']      = np.where((df["callresult"] == 1) & (df['contact'] == 'y'),1,0)
     df['success_calc']      = np.where((df["callresult"] == 1) & (df['success'] == 'y'),1,0)
 
-    log(f" Grouping")
+    log(f" [x] Grouping")
     
     if deep == 0:
-        log(f" Summary by Day")
+        log(f" [x]    Summary by Day")
         header_group =  ['tenantid', 'camp_id', 'year', 'month', 'day']
     elif deep == 1:
-        log(f" Summary by Month")
+        log(f" [x]    Summary by Month")
         header_group =  ['tenantid', 'camp_id', 'year', 'month']
     
     df_day = df.groupby(
@@ -143,8 +142,8 @@ def transform(df, deep=0):
 
     end_time = time.perf_counter()
     elapsed_time_transform = end_time - start_time
-    print(df_day.head(5))
-    logT('TRANSFORM',df_day.shape[0],elapsed_time_transform)
+    # print(df_day.head(5))
+    # logT('TRANSFORM',df_day.shape[0],elapsed_time_transform)
     
     if deep == 0:
         log(f" Elapsed TRANSFORM {elapsed_time_transform:.4f} seconds ")
@@ -158,11 +157,3 @@ def transform(df, deep=0):
     log(f' END TRANSFORM', "", 1)
     loadDB(df_day, deep)
     
-    
-# def unitsCall(billsec_series: pd.Series):
-#     total = 0.0
-#     for billsec in billsec_series:
-#         if billsec == 0:
-#             continue
-#         total += max(3, int(np.ceil(billsec / 6 * 1.3)))
-#     return total

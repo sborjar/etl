@@ -16,7 +16,7 @@ def load_data(file):
         df = pd.read_csv(PROCESSED_FILE, encoding='latin1', low_memory=False)
         return df
     except FileNotFoundError:
-        log(f"Error: No se encontró el archivo {PROCESSED_FILE}")
+        log(f"Error: No se encontro el archivo {PROCESSED_FILE}")
         return None
     
 
@@ -42,10 +42,10 @@ def collect(date1, date2):
         end_time = time.perf_counter()
         elapsed_time_load = end_time - start_time
         log(f" Elapsed file {file} = {elapsed_time_load} seconds")
-        try:
-            logT(f'File {file}',len(df),elapsed_time_load)
-        except Exception as err:
-            logT(f'File {file}',err ,elapsed_time_load)
+        # try:
+        #     logT(f'File {file}',len(df),elapsed_time_load)
+        # except Exception as err:
+        #     logT(f'File {file}',err ,elapsed_time_load)
             
 
         if df is None or df.empty:

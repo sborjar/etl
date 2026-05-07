@@ -30,7 +30,7 @@ def load_data(nfile):
         df = pd.read_csv(PROCESSED_FILE, encoding='latin1', low_memory=False)
         return df
     except FileNotFoundError:
-        log(f"Error: No se encontró el archivo {PROCESSED_FILE}")
+        log(f"Error: No se encontro el archivo {PROCESSED_FILE}")
         return None
 
 

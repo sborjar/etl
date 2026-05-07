@@ -9,17 +9,9 @@ from dotenv import load_dotenv
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from src.funcs import log, logT
 from src.db.connection import db
+from src.config import Config
 
-load_dotenv()
-mode = os.getenv("MODE", "SNBX")
-user = os.getenv(f"DB_USER_{mode}", "SNBX")
-password = os.getenv(f"DB_PASS_{mode}", "SNBX")
-host = os.getenv(f"DB_HOST_{mode}", "SNBX")
-database = os.getenv("DB_NAME", "SNBX")
 method = "python"
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-
 
 def loadDB(df, deep):
     """ 
@@ -32,7 +24,8 @@ def loadDB(df, deep):
         log(f" Dataframe is empty", "error")
         exit(1)
         
-    engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}/{database}")
+    # engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}/{database}")
+    engine = create_engine(Config.DB_engine)
     
     if deep == 0:
         log(f" Saving transformed dataframe to billing_detail")
@@ -131,7 +124,7 @@ def loadDB(df, deep):
     end_time = time.perf_counter()
     elapsed_time = end_time - start_time
     if deep == 0:
-        logT('LOAD',df.shape[0],elapsed_time)
+        # logT('LOAD',df.shape[0],elapsed_time)
         log(f" Elapsed LOAD {elapsed_time} second ")
     elif deep == 1:
         log(f" Elapsed SUMMARY LOAD {elapsed_time} second ")

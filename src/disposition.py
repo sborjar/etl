@@ -26,7 +26,7 @@ def getDisposition():
     elapsed_time1 = end_time - start_time
     log(f' Elapsed query = {elapsed_time1} seconds')
     log(f" Row exported = {len(rows)} rows")
-    logT("Disposition",len(rows),elapsed_time1)
+    # logT("Disposition",len(rows),elapsed_time1)
     
     if len(rows)>0:
         start_time = time.perf_counter()

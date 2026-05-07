@@ -4,6 +4,7 @@ import pandas as pd
 import sys
 import os
 import time
+from datetime import datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
@@ -26,13 +27,14 @@ def delivery(action,date1,date2):
         Create summary tables billing_Detail and billing_summary_campaign
     """
     
-    log(f' BEGIN', "", 0)
-    logT(f'--- BEGIN',date1,date2)
+    log(f' BEGIN ----------------------------------------------------------------------', "", 0)
+    # logT(f'--- BEGIN',date1,date2)
     log(f' Action: {action}', "", 1)
     log(f' Date1: {date1}', "", 1)
     log(f' Date2: {date2}', "", 1)
     
     start_time_total = time.perf_counter()
+    hour_start = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     ex_total = 0
     join_total = 0
@@ -59,10 +61,13 @@ def delivery(action,date1,date2):
         
     end_time_total = time.perf_counter()
     elapsed_total = end_time_total - start_time_total
+    hour_end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     log(f' TOTALS', "", 1)
     log(f" Date                                 {date1} {date2}")
+    log(f" Time start                           {hour_start}")
+    log(f" Time end                             {hour_end}")
     log(f" Elapsed General                      {elapsed_total} seconds")
     log(f' END',"", 0)
     logT(f'Elapsed General',"",elapsed_total)
-    logT(f'--- END',date1,date2)
+    # logT(f'--- END',date1,date2)

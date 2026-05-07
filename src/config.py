@@ -27,8 +27,11 @@ class Config:
 
     DATA_DIR = BASE_DIR / 'data'
     LOG_DIR = BASE_DIR / 'logs'
+    
+    DB_engine = f"mysql+mysqlconnector://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-    @classmethod
-    def get_db_url(cls):
-        """Get database URL for SQLAlchemy."""
-        return f"mysql+mysqlconnector://{cls.DB_USER}:{cls.DB_PASS}@{cls.DB_HOST}:{cls.DB_PORT}/{cls.DB_NAME}"
+    # @classmethod
+    # def get_db_url(cls):
+    #     """Get database URL for SQLAlchemy."""
+    #     # f"mysql+pymysql://{user}:{password}@{host}/{database}"
+    #     return f"mysql+mysqlconnector://{cls.DB_USER}:{cls.DB_PASS}@{cls.DB_HOST}:{cls.DB_PORT}/{cls.DB_NAME}"
